@@ -19,7 +19,10 @@ const ServicePage = () => {
   // -------------------------extract token-------------------------------
 
   const token = localStorage.getItem("authToken");
-  const decoded = jwtDecode(token);
+  let decoded
+  if(token){
+     decoded = jwtDecode(token);
+  } 
   // ---------------------------------image seperation------------------------------
   const totalImages = Object.entries(serviceData)
     .filter(([key, value]) => key.startsWith("image"))
@@ -28,7 +31,9 @@ const ServicePage = () => {
 
 // -----------------------------fetch Booked Dates--------------------------------------
 useEffect(()=>{
-  fetchBookedDates()
+  if(token){
+    fetchBookedDates()
+  }
 },[])
 
 const fetchBookedDates = async()=>{
