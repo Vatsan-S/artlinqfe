@@ -1,0 +1,208 @@
+:root{
+  --fs-nav-wb-body: 1.5rem;
+
+  --clr-grey-sh1:#585858;
+  --clr-sender-bg:white;
+  --clr-sender-text:rgb(31, 31, 31);
+  --clr-chatBg:#e4f5fd;
+  --clr-chat:#3c474d;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* -----------------login------------------- */
+.loginContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loginContainer form{
+  width: 500px;
+}
+
+
+/* ---------------------------navbar-------------------- */
+.c_navbar{
+  display: flex;
+  
+  justify-content: space-between;
+  gap: 32px;
+  width: 100%;
+}
+
+.c_profile{
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 64px;
+  background-color: orange;
+}
+
+.c_profileLayout{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.c_navbarSides{
+  display: flex;
+  align-items: center;
+  
+}
+.c_navicons{
+  display: flex;
+  height: 32px;
+  width: 32px;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: var(--fs-nav-wb-body);
+  color: var(--clr-grey-sh1) ;
+}
+
+.navText{
+  display: none;
+}
+
+.c_registerButton{
+  margin-right: 8px;
+}
+/* ---------------------------create Service--------------------- */
+
+.c_radiogroup{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+
+
+/* -------------------------category list------------------------- */
+.c_categoryList{
+  padding: 32px 0;
+  width: 100%;
+  overflow: hidden;
+}
+.c_cardsCollection{
+  display: flex;
+  overflow: auto;
+  width: 100%;
+  gap: 16px;
+  justify-content: space-between;
+}
+.c_chevron{
+  height: 300px;
+  font-size: 80px;
+  color: lightgray;
+  opacity: 0.4;
+}
+
+/* -----------------------services page--------------------- */
+.imageCollection{
+  height: 600px;
+}
+.shortImages{
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 2px solid green;
+}
+.shortImages img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.imagePreview{
+  max-height: 600px;
+  height: 100%;
+  
+  padding: 0 64px 16px 32px;
+  overflow: hidden;
+}
+
+.previewImg{
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+}
+/* ----------------------------------------chat------------------------------- */
+
+.chatBox{
+  display: flex;
+  flex-direction: column;
+  
+  height: 100%;
+}
+.showLeft{
+  margin-right: auto;
+  padding: 8px 16px;
+  border-radius: 4px;
+  color: var(--clr-sender-text);
+  background-color: var(--clr-sender-bg);
+  margin-bottom: 4px;
+  
+}
+.showRight{
+ 
+  margin-left: auto;
+  padding: 8px 16px;
+  border-radius: 4px;
+  color: var(--clr-chat);
+  background-color: var(--clr-chatBg);
+  margin-bottom: 4px;
+}
+
+
+/* -----------------------home page------------------- */
+
+.profileCircle{
+  height: 64px;
+  width: 64px;
+  background-color: var(--clr-chatBg);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-sender-text);
+  font-size: 24px;
+  font-weight: medium;
+}
+
+
+/* ============================================mobile=================================================== */
+@media only Screen and (max-width:991px) {
+.c_navbar{
+  flex-direction: column
+}
+
+.c_navicons{
+  display: none;
+}
+.c_profile{
+  display: none;
+}
+.navText{
+  display: block;
+}
+
+.m_displayNone{
+  display: none;
+}
+.imageCollection{
+  height: 55px;
+}
+.imagePreview{
+  height: 300px;
+}
+}
