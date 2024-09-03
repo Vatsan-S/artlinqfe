@@ -7,6 +7,7 @@ import Navbar from '../Components/Navbar';
 import { useDispatch } from "react-redux";
 import { setUserInfo } from "../Redux/Slice/userSlice";
 import Footer from "../Components/Footer";
+import { SphereSpinner } from "react-spinners-kit";
 const Login = () => {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
