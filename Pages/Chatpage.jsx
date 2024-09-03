@@ -5,17 +5,24 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 const { Header, Content, Footer, Sider } = Layout;
 import { io } from "socket.io-client";
+import { useParams } from "react-router-dom";
+import { SphereSpinner } from "react-spinners-kit";
 
 const Chatpage = () => {
   // ---------------------------states----------------------------------
   const [allChats, setAllchats] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [socket, setSocket] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [chatUsersLoading, setChatUsersLoading] = useState(false);
   // -----------------------------getting token----------------------------
   const token = localStorage.getItem("authToken");
   const decoded = jwtDecode(token);
+
+  const { userID } = useParams();
   // ----------------------------fetching all chats-------------------------
   const fetchAllChats = async () => {
+    setChatUsersLoading(true);
     try {
       const response = await axios.get(
         "https://artlinq-be.onrender.com/api/chats/fetchAllChats",
@@ -26,8 +33,10 @@ const Chatpage = () => {
         }
       );
       // console.log(response.data.allChats);
+      setChatUsersLoading(false);
       setAllchats(response.data.allChats);
     } catch (error) {
+      setChatUsersLoading(false);
       console.log(error);
     }
   };
@@ -48,7 +57,7 @@ const Chatpage = () => {
   }
 
   const items = allChats.map((ele) => {
-    const user = ele.users.filter((ele)=>ele._id!==decoded.userID)
+    const user = ele.users.filter((user) => user._id !== decoded.userID);
     return getItem(user[0].userName, ele._id, ele);
   });
 
@@ -79,7 +88,7 @@ const Chatpage = () => {
     );
 
     setChatName(otherUser[0].userName);
-
+    setLoading(true);
     try {
       const payload = {
         chat: ele.key,
@@ -93,11 +102,56 @@ const Chatpage = () => {
           },
         }
       );
+      setLoading(false);
       setCurrentChatMessages(result.data.allMessages);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
+  console.log(items);
+  console.log(chatID);
+  // --------------------------------------------handling specific Chat------------------------------------------------
+  useEffect(() => {
+    const updateChat = async () => {
+      setLoading(true);
+      try {
+        const result = await axios.post(
+          "https://artlinq-be.onrender.com/api/chats/accessChat",
+          { userID: userID },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("result", result);
+        setChatID(result.data.chat._id);
+        const chatUserName = result.data.chat.users.filter(
+          (user) => user._id !== decoded.userID
+        );
+        console.log(chatUserName[0].userName);
+        setChatName(chatUserName[0].userName);
+        const fetchAllMessage = await axios.post(
+          "https://artlinq-be.onrender.com/api/chats/fetchAllMessages",
+          { chat: result.data.chat._id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setLoading(false);
+        setCurrentChatMessages(fetchAllMessage.data.allMessages);
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
+    };
+    if (userID) {
+      updateChat();
+    }
+  }, [userID]);
   // ------------------------------------------handle send message-----------------------------------------------------
   const handleSendMessage = async () => {
     if (!msgContent.trim()) {
@@ -118,10 +172,9 @@ const Chatpage = () => {
           },
         }
       );
-      setMsgContent('')
-      console.log('Working')
+      setMsgContent("");
+      console.log("Working");
       socket.emit("chat message", payload);
-      
     } catch (error) {
       console.log(error);
     }
@@ -142,13 +195,20 @@ const Chatpage = () => {
             collapsed={collapsed}
             onCollapse={(value) => setCollapsed(value)}
           >
-            <Menu
-              theme="dark"
-              defaultSelectedKeys={[]}
-              mode="inline"
-              items={items}
-              onClick={handleChatClick}
-            />
+            {chatUsersLoading === false ? (
+              <Menu
+                theme="dark"
+                defaultSelectedKeys={[`${chatID}`]}
+                mode="inline"
+                items={items}
+                onClick={handleChatClick}
+              />
+            ) : (
+              <div className="spinner">
+                <SphereSpinner size={15} color="white" loading={chatUsersLoading} />
+                <span style={{color:'white'}}>Loading</span>
+              </div>
+            )}
           </Sider>
           <Layout
             style={{
@@ -157,10 +217,14 @@ const Chatpage = () => {
           >
             <Header
               style={{
-                padding: 0,
                 background: colorBgContainer,
+                display: "flex",
+                alignItems: "center",
+                padding: 15,
               }}
-            />
+            >
+              <h5 className="chatName">{chatName}</h5>
+            </Header>
             <Content
               style={{
                 margin: "0 16px",
@@ -173,19 +237,54 @@ const Chatpage = () => {
                   minHeight: 360,
                 }}
               >
-                {currentChatMessages.map((ele, index) => {
-                  return (
-                    <h6
-                      key={index}
-                      className={
-                        ele.sender === decoded.userID ? "showRight" : "showLeft"
-                      }
+                {loading === false ? (
+                  <div className="chatDiv">
+                    {currentChatMessages.map((ele, index) => {
+                      return (
+                        <h6
+                          key={index}
+                          className={
+                            ele.sender === decoded.userID
+                              ? "showRight"
+                              : "showLeft"
+                          }
+                        >
+                          {ele.content}
+                        </h6>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <>
+                    <SphereSpinner
+                      size={15}
+                      color="#C2DEEB"
+                      loading={loading}
+                    />
+                    Loading
+                  </>
+                )}
+                {chatID !== "" ? (
+                  <div className="textInput">
+                    <Space.Compact
+                      style={{
+                        width: "100%",
+                      }}
                     >
-                      {ele.content}
-                    </h6>
-                  );
-                })}
-                <div className="textInput"></div>
+                      <Input
+                        placeholder="Type your message Here"
+                        value={msgContent}
+                        onChange={(e) => setMsgContent(e.target.value)}
+                        required
+                      />
+                      <Button type="primary" onClick={handleSendMessage}>
+                        Send
+                      </Button>
+                    </Space.Compact>
+                  </div>
+                ) : (
+                  <></>
+                )}
               </div>
             </Content>
             <Footer
@@ -193,23 +292,7 @@ const Chatpage = () => {
                 textAlign: "center",
                 padding: 8,
               }}
-            >
-              <Space.Compact
-                style={{
-                  width: "100%",
-                }}
-              >
-                <Input
-                  placeholder="Type your message Here"
-                  value={msgContent}
-                  onChange={(e) => setMsgContent(e.target.value)}
-                  required
-                />
-                <Button type="primary" onClick={handleSendMessage}>
-                  Send
-                </Button>
-              </Space.Compact>
-            </Footer>
+            ></Footer>
           </Layout>
         </Layout>
       </div>

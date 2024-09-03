@@ -8,6 +8,7 @@ import { Button, Form, Radio, Input, Select, Upload } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import { SphereSpinner } from "react-spinners-kit";
+import { useSelector } from "react-redux";
 const { Option } = Select;
 
 const formItemLayout = {
@@ -42,12 +43,35 @@ const tailFormItemLayout = {
 };
 const Navbar = () => {
   // -----------------------------states--------------------------------
-  const navigate = useNavigate()
+  const { allServiceData } = useSelector((state) => state.Service);
+  // console.log("allServiceData", allServiceData);
+  const navigate = useNavigate();
   const [category, setCategory] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
 
+  // --------------------------------search Logic--------------------------
+  useEffect(() => {
+    if(searchValue === ''){
+      setSearchResult([])
+    }else{
+      setSearchResult(
+        allServiceData.filter((ele) =>
+          ele.title.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
+    }
+  }, [searchValue]);
+  // console.log("searchResult",searchResult)
+
+  // -----------------------------------search Item Click---------------------------
+
+  const searchItemClick = (id)=>{
+    navigate(`/servicePage/${id}`)
+  }
   //   -------------------------------fetch Token------------------------
 
   let token = localStorage.getItem("authToken");
@@ -57,26 +81,24 @@ const Navbar = () => {
     const decodedToken = jwtDecode(token);
     userRole = decodedToken.role;
     userID = decodedToken.userID;
-    
   }
   // -----------------------------------upload function----------------------------------
-  const uploadFiles = async(file) => {
-   try {
-    
-    const payload = new FormData()
-    payload.append("file", file[0].originFileObj);
-    payload.append("upload_preset", "images_preset");
-    
-    const response = await axios.post(
-      "https://api.cloudinary.com/v1_1/ddycjnke1/image/upload",
-      payload
-    );
-    const { secure_url } = response.data;
+  const uploadFiles = async (file) => {
+    try {
+      const payload = new FormData();
+      payload.append("file", file[0].originFileObj);
+      payload.append("upload_preset", "images_preset");
 
-    return secure_url;
-   } catch (error) {
-    console.log(error.response.data)
-   }
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/ddycjnke1/image/upload",
+        payload
+      );
+      const { secure_url } = response.data;
+
+      return secure_url;
+    } catch (error) {
+      console.log(error.response.data);
+    }
   };
   // -----------------------------------modal--------------------------------------------
   const [form] = Form.useForm();
@@ -84,12 +106,10 @@ const Navbar = () => {
   const handleSubmit = async (value) => {
     setSuccessMsg("");
     setLoading(true);
-    
+
     let img1;
     if (value.image1) {
-      
       img1 = await uploadFiles(value.image1);
-      
     }
 
     let img2;
@@ -117,13 +137,12 @@ const Navbar = () => {
     };
 
     await axios
-      .post("http://localhost:4000/api/service/createService", payload, {
+      .post("https://artlinq-be.onrender.com/service/createService", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
-        
         setLoading(false);
         form.resetFields();
         setSuccessMsg("Service Created");
@@ -133,147 +152,16 @@ const Navbar = () => {
         setLoading(false);
         setSuccessMsg("");
       });
-    
   };
 
   // --------------------------------handling logout-------------------------------------------
-  const handleLogout = ()=>{
-    localStorage.removeItem("authToken")
-    location.reload()
-  }
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    location.reload();
+  };
   //   ======================================================jsx=================================================
   return (
     <div className="container-fluid">
-      <nav className="navbar navbar-expand-lg bg-body-tertiary">
-        <div className="container-fluid">
-          <Link to="/" className="navbar-brand" href="#">
-            ArtLinQ
-          </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div
-            className="collapse navbar-collapse c_navbar"
-            id="navbarSupportedContent"
-          >
-            <form className="d-flex" role="search">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <button className="btn btn-outline-success" type="submit">
-                Search
-              </button>
-            </form>
-            {token ? (
-              <>
-                <ul className="navbar-nav  mb-2 mb-lg-0 c_navbarSides">
-                  <li className="nav-item">
-                    <Link
-                      className="nav-link active"
-                      aria-current="page"
-                      href="#"
-                    >
-                      <div className="c_navicons" onClick={()=>{navigate('/')}}>
-                        <HiHome />
-                      </div>
-                      <div className="navText" onClick={()=>{navigate('/')}}>
-                        <p>Home</p>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link className="nav-link"to='/chats'>
-                      <div className="c_navicons">
-                        <IoMdChatbubbles />
-                      </div>
-                      <div className="navText">
-                        <p>Chats</p>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="nav-item navText">
-                    <Link className="nav-link" href="#">
-                      <div className="navText">
-                        <p>Profile</p>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="nav-item navText" onClick={handleLogout}>
-                    <Link className="nav-link" href="#" >
-                      <div className="navText" >
-                        <p>Logout</p>
-                      </div>
-                    </Link>
-                  </li>
-                  {userRole === "Artist" && (
-                    <li className="nav-item">
-                      <Link className="nav-link ">
-                        <button
-                          className="btn btn-primary"
-                          data-bs-toggle="modal"
-                          data-bs-target="#createService"
-                        >
-                          create Service
-                        </button>
-                      </Link>
-                    </li>
-                  )}
-                  <li className="nav-item dropdown m_displayNone">
-                    <a
-                      className="nav-link dropdown-toggle d-flex c_profileLayout"
-                      href="#"
-                      role="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <div className="c_profile">
-                        <UserOutlined />
-                      </div>
-                    </a>
-                    <ul className="dropdown-menu">
-                      <li onClick={handleLogout}>
-                        <Link className="dropdown-item" href="#">
-                          Log Out
-                        </Link>
-                      </li>
-                      <li>
-                        <Link className="dropdown-item" href="#">
-                          View Profile
-                        </Link>
-                      </li>
-                      <li>
-                        <hr className="dropdown-divider" />
-                      </li>
-                      <li>
-                        <Link className="dropdown-item" href="#">
-                          Something else here
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <button className="btn-primary btn">Login</button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
       {/* ---------------------------------modal zone-------------------------- */}
       <div className="modal" tabIndex="-1" id="createService">
         <div className="modal-dialog">
@@ -316,12 +204,7 @@ const Navbar = () => {
                     },
                   ]}
                 >
-                  <Upload
-                    name="image1"
-                    listType="picture"
-                    maxCount={1}
-                    
-                  >
+                  <Upload name="image1" listType="picture" maxCount={1}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                   </Upload>
                 </Form.Item>
@@ -336,12 +219,7 @@ const Navbar = () => {
                     return e && e.fileList;
                   }}
                 >
-                  <Upload
-                    name="image2"
-                    listType="picture"
-                    maxCount={1}
-                    
-                  >
+                  <Upload name="image2" listType="picture" maxCount={1}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                   </Upload>
                 </Form.Item>
@@ -356,12 +234,7 @@ const Navbar = () => {
                     return e && e.fileList;
                   }}
                 >
-                  <Upload
-                    name="image3"
-                    listType="picture"
-                    maxCount={1}
-                    
-                  >
+                  <Upload name="image3" listType="picture" maxCount={1}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                   </Upload>
                 </Form.Item>
@@ -376,12 +249,7 @@ const Navbar = () => {
                     return e && e.fileList;
                   }}
                 >
-                  <Upload
-                    name="image4"
-                    listType="picture"
-                    maxCount={1}
-                   
-                  >
+                  <Upload name="image4" listType="picture" maxCount={1}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                   </Upload>
                 </Form.Item>
@@ -452,6 +320,7 @@ const Navbar = () => {
                         <Button
                           data-bs-dismiss="modal"
                           data-bs-target="#createService"
+                          onClick={()=>{setSuccessMsg(''); setErrMsg('')}}
                         >
                           Close
                         </Button>
@@ -480,6 +349,161 @@ const Navbar = () => {
         </div>
       </div>
       {/* ---------------------------------modal ends here------------------------------------ */}
+      <nav className="navbar navbar-expand-lg bg-body-tertiary">
+        <div className="container-fluid">
+          <Link to="/" className="navbar-brand" href="#">
+            ArtLinQ
+          </Link>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div
+            className="collapse navbar-collapse c_navbar"
+            id="navbarSupportedContent"
+          >
+            <form className="d-flex searchForm" role="search">
+              <input
+                className="form-control me-2"
+                type="search"
+                placeholder="Search services"
+                aria-label="Search"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+              {searchResult.length > 0 && (
+                <div className="searchResult">
+                  {searchResult.map((ele, index) => {
+                    return (
+                      <p key={index} className="searchItem" onClick={()=>searchItemClick(ele._id)}>
+                        {ele.title}
+                      </p>
+                    );
+                  })}
+                </div>
+              )}
+              {/* <button className="btn btn-outline-success" type="submit">
+                Search
+              </button> */}
+            </form>
+            {token ? (
+              <>
+                <ul className="navbar-nav  mb-2 mb-lg-0 c_navbarSides">
+                  <li className="nav-item">
+                    <Link
+                      className="nav-link active"
+                      aria-current="page"
+                      href="#"
+                      to='/'
+                    >
+                      <div
+                        className="c_navicons"
+                        onClick={() => {
+                          navigate("/");
+                        }}
+                      >
+                        <HiHome />
+                      </div>
+                      <div
+                        className="navText"
+                        onClick={() => {
+                          navigate("/");
+                        }}
+                      >
+                        <p>Home</p>
+                      </div>
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/chats">
+                      <div className="c_navicons">
+                        <IoMdChatbubbles />
+                      </div>
+                      <div className="navText">
+                        <p>Chats</p>
+                      </div>
+                    </Link>
+                  </li>
+                  <li className="nav-item navText">
+                    <Link className="nav-link" to="/userProfile">
+                      <div className="navText">
+                        <p>Profile</p>
+                      </div>
+                    </Link>
+                  </li>
+                  <li className="nav-item navText" onClick={handleLogout}>
+                    <Link className="nav-link" href="#">
+                      <div className="navText">
+                        <p>Logout</p>
+                      </div>
+                    </Link>
+                  </li>
+                  {userRole === "Artist" && (
+                    <li className="nav-item">
+                      <Link className="nav-link ">
+                        <button
+                          className="btn btn-primary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createService"
+                        >
+                          create Service
+                        </button>
+                      </Link>
+                    </li>
+                  )}
+                  <li className="nav-item dropdown m_displayNone">
+                    <a
+                      className="nav-link dropdown-toggle d-flex c_profileLayout"
+                      href="#"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      <div className="c_profile">
+                        <UserOutlined />
+                      </div>
+                    </a>
+                    <ul className="c_dropdown-menu dropdown-menu">
+                      <li onClick={handleLogout}>
+                        <Link className="dropdown-item" href="#">
+                          Log Out
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className="dropdown-item" to="/userProfile">
+                          View Profile
+                        </Link>
+                      </li>
+                      {/* <li>
+                        <hr className="dropdown-divider" />
+                      </li>
+                      <li>
+                        <Link className="dropdown-item" href="#">
+                          Revenue
+                        </Link>
+                      </li> */}
+                    </ul>
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <button className="btn-primary btn">Login</button>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+      
     </div>
   );
 };

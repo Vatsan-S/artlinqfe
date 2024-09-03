@@ -5,22 +5,24 @@ import { IoChevronForwardCircleSharp } from "react-icons/io5";
 import { useDispatch } from "react-redux";
 import { updateServiceData } from "../Redux/Slice/serviceSlice";
 import { useNavigate } from "react-router-dom";
+import EcommerceLoading from "./Loading";
 
-const CategoryList = ({ data, type }) => {
+const CategoryList = ({ data, type, loading }) => {
 const dispatch = useDispatch()
 const navigate = useNavigate()
     // -----------------------------handling card click-----------------------------
     const handleClick = (ele)=>{
-dispatch(updateServiceData(ele))
-navigate('/servicePage')
+// dispatch(updateServiceData(ele))
+
+navigate(`/servicePage/${ele._id}`)
     }
   return (
     <div className="c_categoryList">
         <div className="c_categoryTitle d-flex justify-content-between">
         <h5>{type}</h5>
-        <p>See All</p>
+        <p onClick={()=>{navigate(`/serviceList/${type.split(' ')[0]}`)}}>See All</p>
         </div>
-        <div className="c_cardsCollection">
+        {loading === false ? <div className="c_cardsCollection">
       {data.map((ele, index) => {
         return (
           <div className="c_eachCard" key={index} onClick={()=>handleClick(ele)}>
@@ -52,7 +54,7 @@ navigate('/servicePage')
         );
       })}
       {/* <div className="c_chevron  d-flex align-items-center justify-content-center"><IoChevronForwardCircleSharp /></div> */}
-    </div>
+    </div>:<div ><EcommerceLoading/></div>}
     </div>
   );
 };

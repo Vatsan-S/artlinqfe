@@ -3,11 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const serviceSlice = createSlice({
     name: "services",
     initialState:{
-        serviceData:{}
+        allServiceData:{}
     },
     reducers:{
         updateServiceData:(state,action)=>{
-            state.serviceData = action.payload
+            state.allServiceData = action.payload
         }
     }
 })

@@ -5,6 +5,7 @@ import { SphereSpinner } from "react-spinners-kit";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Navbar from '../Components/Navbar';
+import Footer from "../Components/Footer";
 
 const ForgotPassword = () => {
     
@@ -92,6 +93,7 @@ setMsg('')
         </Form.Item>
       </Form>
       </div>
+      <Footer/>
     </div>
   );
 };

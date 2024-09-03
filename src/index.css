@@ -13,7 +13,37 @@
   padding: 0;
   box-sizing: border-box;
 }
-
+/* ------------------common-------------------- */
+.spinner{
+  display: flex;
+  margin: 8px auto ;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.errMsg{
+  color: red;
+}
+.successMsg{
+  color: green;
+  padding: 4px 8px;
+  /* border: 1px solid green; */
+  border-radius: 4px;
+  width: 150px;
+  /* background-color: greenyellow; */
+}
+/* banner--------------------- */
+/* .banner{
+  padding-top: 60px;
+} */
+.banner img{
+  width: 100%;
+  object-fit: contain;
+}
+.mobDisplay{
+  display: none;
+}
 /* -----------------login------------------- */
 .loginContainer{
   display: flex;
@@ -74,6 +104,46 @@
 .c_registerButton{
   margin-right: 8px;
 }
+.c_dropdown-menu{
+  position: absolute !important;
+  right: 0 !important;
+  transform: translate(-90px,0);
+}
+
+/* ----------------------------scrollbar template-------------------- */
+
+::-webkit-scrollbar {
+  width: 6px; 
+  height: 6px; 
+}
+
+
+::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 6px; 
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 6px; 
+}
+
+
+::-webkit-scrollbar-track-piece {
+  background: #f1f1f1; 
+}
+
+
+::-webkit-scrollbar-corner {
+  background: #f1f1f1; 
+}
+
 /* ---------------------------create Service--------------------- */
 
 .c_radiogroup{
@@ -85,6 +155,37 @@
 
 
 /* -------------------------category list------------------------- */
+
+.loading-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 20px;
+  max-width: 1440px;
+  margin: auto;
+  
+}
+
+.loading-card {
+  width: 200px;
+  height: 250px;
+  margin: 2px;
+  background-color: #f0f0f0; 
+  border-radius: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
 .c_categoryList{
   padding: 32px 0;
   width: 100%;
@@ -141,7 +242,7 @@
 .chatBox{
   display: flex;
   flex-direction: column;
-  
+  position: relative;
   height: 100%;
 }
 .showLeft{
@@ -162,7 +263,20 @@
   background-color: var(--clr-chatBg);
   margin-bottom: 4px;
 }
+.textInput{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 
+.chatDiv{
+  height: 70vh;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
 
 /* -----------------------home page------------------- */
 
@@ -179,7 +293,103 @@
   font-weight: medium;
 }
 
+/* --------------------------------profile page------------------------- */
+.profilePicture{
+  height: 120px;
+  width: 120px;
+  border-radius: 60px;
+  background-color: var(--clr-chatBg);
+  font-size: 32px;
+  font-weight: medium;
+  color: var(--clr-sender-text);
+}
 
+.topProfile{
+  margin-top: 64px;
+}
+
+.bottomProfile{
+  margin-top: 58px;
+  margin-bottom: 24px;
+  
+}
+.userServices{
+  margin-top: 24px;
+  padding: 16px 0;
+}
+
+.actions{
+  margin-top: 32px
+}
+
+.userServices{
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+/* ----------------------search result------------------------- */
+.navbarWrap{
+  z-index: 999;
+  position: fixed;
+  right: 0;
+  left: 0;
+}
+.searchForm{
+  z-index: 9;
+  position: relative;
+}
+.searchResult{
+  position: absolute;
+  top: 40px;
+  width: 400px;
+
+  height: 300px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  background-color: white;
+  overflow: auto;
+  
+}
+
+.searchItem{
+  padding: 16px;
+  border-bottom: 1px solid var(--clr-chatBg);
+  cursor: pointer;
+}
+
+/* ---------------------------manage bookings------------------------ */
+.TimeSlotContainer{
+  background-color: var(--clr-chatBg);
+  height: 80px;
+  padding: 8px;
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+.timeSlot{
+  display: flex;
+  width: 70px;
+  height: 30px;
+  padding: 4px;
+  border: 1px solid var(--clr-sender-text);
+  font-size: 16px;
+  border-radius: 4px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeSlot p{
+  margin: 0
+}
+
+/* ----------------------userEdit-------------------- */
+.editActions{
+  display: flex;
+  gap: 8px
+}
+/* -----------------footer----------------- */
+.socialIcon{
+  font-size: 24px;
+}
 /* ============================================mobile=================================================== */
 @media only Screen and (max-width:991px) {
 .c_navbar{
@@ -204,5 +414,30 @@
 }
 .imagePreview{
   height: 300px;
+}
+.searchResult{
+  left: -70px;
+  width: 360px;
+}
+.userServices{
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-right: 16px;
+}
+.webDisplay{
+  display: none;
+
+}
+.mobDisplay{
+  display: block;
+}
+.loading-container{
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: scroll;
+  margin: 0;
+}
+.loading-card{
+  width: 500px;
 }
 }

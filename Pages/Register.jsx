@@ -4,6 +4,7 @@ import axios from "axios";
 import { SphereSpinner } from "react-spinners-kit";
 import { useNavigate } from "react-router-dom";
 import Navbar from '../Components/Navbar';
+import Footer from "../Components/Footer";
 const { Option } = Select;
 
 const formItemLayout = {
@@ -223,6 +224,7 @@ const App = () => {
         </Form.Item>
       </Form>
       </div>
+      <Footer/>
     </div>
   );
 };

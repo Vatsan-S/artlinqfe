@@ -4,16 +4,20 @@ import { Button, Checkbox, Form, Input, Flex } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from '../Components/Navbar';
+import { useDispatch } from "react-redux";
+import { setUserInfo } from "../Redux/Slice/userSlice";
+import Footer from "../Components/Footer";
 const Login = () => {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-
+  const dispatch = useDispatch()
   //   -------------------------------handle submit---------------------------------
   const handleSubmit = async (values) => {
     setErrMsg('')
-   
+   setLoading(true)
     const payload = {
       email: loginEmail,
       password: loginPassword,
@@ -21,12 +25,15 @@ const Login = () => {
     await axios
       .post("https://artlinq-be.onrender.com/api/user/login", payload)
       .then((res) => {
-        // console.log(res)
+        console.log(res)
+        dispatch(setUserInfo(res.data.existingUser))
         localStorage.setItem('authToken', res.data.token)
+        setLoading(false)
         navigate('/')
       })
       .catch((err) => {
         console.log(err)
+        setLoading(false)
         setErrMsg(err.response.data.message)
       });
   };
@@ -90,13 +97,14 @@ const Login = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button block type="primary" htmlType="submit" >
+          {loading===false?<Button block type="primary" htmlType="submit" >
             Log in
-          </Button>
+          </Button>:<Button block disabled={loading}><SphereSpinner size={15} color="#C2DEEB" loading={loading} />Loading</Button>}
           or <Link to="/register">Register now!</Link>
         </Form.Item>
       </Form>
       </div>
+      <Footer/>
     </div>
   );
 };

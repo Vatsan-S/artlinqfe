@@ -1,8 +1,14 @@
 import persistReducer from "redux-persist/es/persistReducer";
 import serviceSlice from "./Slice/serviceSlice";
 import storage from "redux-persist/lib/storage";
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import persistStore from "redux-persist/es/persistStore";
+import userSlice from "./Slice/userSlice";
+
+const rootSlice = combineReducers({
+    User : userSlice,
+    Service: serviceSlice
+})
 
 const persistConfig = {
     key:'root',
@@ -10,7 +16,7 @@ const persistConfig = {
     version:1
 }
 
-const persistedReducer = persistReducer(persistConfig, serviceSlice)
+const persistedReducer = persistReducer(persistConfig, rootSlice)
 
 export const store = configureStore({
     reducer: persistedReducer,
