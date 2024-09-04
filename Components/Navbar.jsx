@@ -135,9 +135,9 @@ const Navbar = () => {
       description: value.description,
       title: value.title,
     };
-
+console.log(payload)
     await axios
-      .post("https://artlinq-be.onrender.com/service/createService", payload, {
+      .post("https://artlinq-be.onrender.com/api/service/createService", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
