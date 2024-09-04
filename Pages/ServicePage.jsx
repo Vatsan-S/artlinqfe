@@ -263,7 +263,7 @@ const ServicePage = () => {
   const handleSubmit = async (value) => {
     setEditLoading(true);
     let image1;
-    console.log(img1);
+    console.log("image1",img2);
     if (img1) {
       image1 = await uploadFiles(img1);
     }
@@ -287,12 +287,12 @@ const ServicePage = () => {
       description: serviceDescription,
       title: title,
     };
-    console.log(payload);
+    
     if (image1) payload["image1"] = image1;
     if (image2) payload["image2"] = image2;
     if (image3) payload["image3"] = image3;
     if (image4) payload["image4"] = image4;
-
+    console.log(payload);
     try {
       const result = await axios.post(
         "https://artlinq-be.onrender.com/api/service/editService",
@@ -599,7 +599,7 @@ const ServicePage = () => {
                         return e && e.fileList;
                       }}
                     >
-                      <Upload name="image2" listType="picture" maxCount={1}>
+                      <Upload name="image2" listType="picture" maxCount={1} onChange={(e) => setImg2(e.file)}>
                         <Button icon={<UploadOutlined />}>
                           Click to Upload
                         </Button>
@@ -616,7 +616,7 @@ const ServicePage = () => {
                         return e && e.fileList;
                       }}
                     >
-                      <Upload name="image3" listType="picture" maxCount={1}>
+                      <Upload name="image3" listType="picture" maxCount={1} onChange={(e) => setImg3(e.file)}>
                         <Button icon={<UploadOutlined />}>
                           Click to Upload
                         </Button>
@@ -633,7 +633,7 @@ const ServicePage = () => {
                         return e && e.fileList;
                       }}
                     >
-                      <Upload name="image4" listType="picture" maxCount={1}>
+                      <Upload name="image4" listType="picture" maxCount={1} onChange={(e) => setImg4(e.file)}>
                         <Button icon={<UploadOutlined />}>
                           Click to Upload
                         </Button>
